@@ -1,8 +1,16 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Automatic Shop</title>
+    <style>
+        #localVideo {
+            width: 500px;
+            height: 375px;
+            background-color: #666;
+        }
+    </style>
 </head>
 <body>
     {% if request.user.is_authenticated %}
@@ -19,5 +27,15 @@
         {% endfor %}
     </table>
 
+    <form action="{% url 'shop:product_show' %}" method="post">
+        {% csrf_token %}
+        <input type="text" placeholder="Enter Machine ID" id="machineID" name="machineID">
+        <button type="submit">Buy</button>
+    </form>
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message.tags }} {{ message }}</p>
+        {% endfor %}
+    {% endif %}
 </body>
 </html>

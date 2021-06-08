@@ -1,13 +1,43 @@
+from django.views.decorators import gzip
 from django.contrib.auth.decorators import login_required
+from django.http import StreamingHttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
+from django.contrib import messages
 
 from .models import Product, Purchase
 from .forms import BuyProductFrom
+from users.models import Machine
+
+
+# def gen(camera):
+#     while True:
+#         frame = camera.get_frame()
+#         yield (b'--frame\r\n'
+#                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+#
+#
+# @gzip.gzip_page
+# def camera_feed(request):
+#     try:
+#         camera = VideoCamera()
+#         return StreamingHttpResponse(gen(camera), content_type="multipart/x-mixed-replace;boundary=frame")
+#     except:
+#         return StreamingHttpResponse(np.zeros((300, 300, 3), np.uint8))
 
 
 def show_product(request):
     product = Product.objects.all()
+
+    if request.method == 'POST':
+        machine_id = request.POST['machineID']
+        try:
+            machine = Machine.objects.get(machine_code=machine_id)
+            print(machine.product.id)
+            return redirect('shop:payment', machine.product.id)
+        except:
+            messages.error(request, "This code is not valid")
+
     context = {
         'products': product,
     }
